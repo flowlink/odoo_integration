@@ -34,6 +34,7 @@ module OpenErp
       def product_to_product_import_message(product)
         {
           product: {
+            id: product.id,
             sku: product.default_code,
             name: product.name,
             price: product.list_price,
@@ -45,6 +46,7 @@ module OpenErp
       def variant_product_to_product_import_message(product)
         {
           product: {
+            id: product.id,
             sku: product.permalink,
             name: product.name,
             price: product.list_price,
@@ -54,9 +56,9 @@ module OpenErp
                 name: product.variants,
                 sku: product.default_code,
                 price: product.list_price,
-                options: [{
+                options: {
                   ProductImporter.hyphenate_variant(product.variants) => product.variants
-                }]
+                }
               }
             ]
           }
