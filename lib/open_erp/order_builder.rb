@@ -56,7 +56,7 @@ module OpenErp
 
       def validate_line_items?
         !payload[:order][:line_items].any? do |line_item|
-          ::ProductProduct.find(name: line_item['variant']['name']).length < 1
+          ::ProductProduct.find(name: line_item['name']).length < 1
         end
       end
 
