@@ -31,7 +31,7 @@ class OpenErpEndpoint < EndpointBase::Sinatra::Base
       set_summary e.message
     end
 
-    process_result 200
+    process_result code
   end
 
   post '/update_order' do
