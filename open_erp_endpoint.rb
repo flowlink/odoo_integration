@@ -11,8 +11,11 @@ class OpenErpEndpoint < EndpointBase::Sinatra::Base
   post '/get_products' do
     begin
       code = 200
-      response = @client.import_products
-      add_messages 'product:import', response
+
+      @client.import_products.each do |product|
+        add_object 'product', product
+      end
+
       set_summary 'All products waiting for import from OpenERP have been imported.'
     rescue => e
       code = 500
