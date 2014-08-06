@@ -8,7 +8,7 @@ GIT
 
 GIT
   remote: git://github.com/spree/endpoint_base.git
-  revision: fefcdcb520559534584945885ed8b7e28dffc437
+  revision: dac37b490353cea6ca2b06a1b1b81acc0af6888c
   specs:
     endpoint_base (0.3)
       activesupport
@@ -60,10 +60,10 @@ GEM
     httparty (0.12.0)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
-    i18n (0.6.9)
-    jbuilder (2.0.2)
-      activesupport (>= 3.0.0)
-      multi_json (>= 1.2.0)
+    i18n (0.6.11)
+    jbuilder (2.1.3)
+      activesupport (>= 3.0.0, < 5)
+      multi_json (~> 1.2)
     json (1.8.1)
     kgio (2.8.1)
     listen (2.4.0)
@@ -72,7 +72,7 @@ GEM
       rb-inotify (>= 0.9)
     lumberjack (1.0.4)
     method_source (0.8.2)
-    minitest (5.3.4)
+    minitest (5.4.0)
     multi_json (1.10.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
@@ -129,7 +129,7 @@ GEM
       tilt (<= 1.4.1)
     timers (1.1.0)
     tins (0.13.1)
-    tzinfo (1.2.0)
+    tzinfo (1.2.1)
       thread_safe (~> 0.1)
     unicorn (4.7.0)
       kgio (~> 2.6)
