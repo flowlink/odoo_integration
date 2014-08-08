@@ -1,9 +1,10 @@
 module OpenErp
   class OrderBuilder
-    attr_reader :payload, :config
+    attr_reader :payload, :config, :order
 
     def initialize(payload, config)
       @payload = payload
+      @order = payload[:order]
       @config  = config
     end
 
@@ -49,6 +50,7 @@ module OpenErp
 
     def update!
       raise OpenErpEndpointError, "All products in the order must exist on OpenERP!" unless validate_line_items?
+
       order = find_order
       order.partner_id = set_customer(order, payload['order']['email'])
       order.partner_invoice_id = order.partner_id
@@ -73,9 +75,8 @@ module OpenErp
       end
 
       def find_order
-        order = SaleOrder.find(name: "#{payload['order']['number']}").first
-        return order if order
-        raise OpenErpEndpointError, "Order #{payload['order']['number']} could not be found on OpenErp!"
+        return @sale_order if @sale_order ||= SaleOrder.find(name: "#{order[:id]}").first
+        raise OpenErpEndpointError, "Order #{order[:number]} could not be found on OpenErp!"
       end
 
       def set_line_items(order)
@@ -173,7 +174,12 @@ module OpenErp
 
       def set_customer(order, email)
         result = ResPartner.find(email: email, type: 'default')
-        customer = result.empty? ? OpenErp::CustomerManager.new(ResPartner.new, payload) : OpenErp::CustomerManager.new(result.first, payload)
+        customer = if result.empty?
+                     OpenErp::CustomerManager.new(ResPartner.new, payload)
+                   else
+                     OpenErp::CustomerManager.new(result.first, payload)
+                   end
+
         order.partner_id = customer.update!.id
       end
 

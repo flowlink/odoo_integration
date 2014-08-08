@@ -17,10 +17,6 @@ describe OpenErp::OrderBuilder do
     OpenErp::OrderBuilder.new(payload, Factory.config)
   end
 
-  before(:each) do
-    payload[:order][:number] = "5dced1113345432311"
-  end
-
   describe "#build!" do
     it "sets the required attributes" do
       VCR.use_cassette('build_order') do
@@ -43,8 +39,9 @@ describe OpenErp::OrderBuilder do
 
   describe "#update!" do
     it "updates line items" do
-      payload['original']['line_items'].each { |li|  li['quantity'] = 10.0 }
-      VCR.use_cassette('build_order_update') do
+      payload[:order][:line_items].each { |li| li[:quantity] = 10.0 }
+
+      VCR.use_cassette('order_update') do
         order = subject.update!
         order.order_line.first.product_uom_qty.should == 10.0
       end
