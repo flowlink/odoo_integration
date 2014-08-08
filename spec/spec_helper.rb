@@ -4,17 +4,20 @@ require 'rubygems'
 Bundler.require(:default, :test)
 
 require_relative '../open_erp_endpoint.rb'
-require 'support/order_factory.rb'
-require 'support/parameters_factory.rb'
-require 'support/product_factory.rb'
-
 require 'spree/testing_support/controllers'
+
+Dir["./spec/support/**/*.rb"].each { |f| require f }
 
 Sinatra::Base.environment = 'test'
 
 def app
   OpenErpEndpoint
 end
+
+ENV['OPENERP_URL'] ||= "http://staging.example.com"
+ENV['OPENERP_DB'] ||= "db"
+ENV['OPENERP_USER'] ||= "user"
+ENV['OPENERP_PASS'] ||= "pass"
 
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true
@@ -31,10 +34,13 @@ RSpec.configure do |config|
   config.order = 'random'
 end
 
-ENV['ENDPOINT_KEY'] = '6a204bd89f3c8348afd5c77c717a097a'
-
 VCR.configure do |c|
   c.allow_http_connections_when_no_cassette = true
-  c.cassette_library_dir = 'spec/vcr_cassettes'
+  c.cassette_library_dir = 'spec/cassetes'
   c.hook_into :webmock
+
+  c.filter_sensitive_data("OPENERP_URL") { URI(ENV["OPENERP_URL"]).host }
+  c.filter_sensitive_data("OPENERP_DB") { ENV["OPENERP_DB"] }
+  c.filter_sensitive_data("OPENERP_USER") { ENV["OPENERP_USER"] }
+  c.filter_sensitive_data("OPENERP_PASS") { ENV["OPENERP_PASS"] }
 end

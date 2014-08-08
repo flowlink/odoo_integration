@@ -10,20 +10,15 @@ describe OpenErp::OrderBuilder do
     end
   end
 
-  let!(:payload) do
-    {
-      'order' => Factories.order,
-      'original' => Factories.original,
-      'parameters' => Factories.parameters
-    }
-  end
+  let(:payload) { { order: Factory.order_payload }.with_indifferent_access }
+  let(:config) { Factory.config }
 
   subject do
-    OpenErp::OrderBuilder.new(payload, Factories.config)
+    OpenErp::OrderBuilder.new(payload, Factory.config)
   end
 
   before(:each) do
-    payload['order']['number'] = "5dced1113345432311"
+    payload[:order][:number] = "5dced1113345432311"
   end
 
   describe "#build!" do
@@ -34,6 +29,8 @@ describe OpenErp::OrderBuilder do
 
       VCR.use_cassette('build_order') do
         order = subject.build!
+        expect(order).to be_persisted
+
         order.partner_id.should be_present
         order.partner_shipping_id.should be_present
         order.shop_id.should be_present

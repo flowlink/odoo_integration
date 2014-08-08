@@ -2,4 +2,3 @@
 *.swo
 tmp
 config/deploy.rb
-spec/vcr_cassettes
