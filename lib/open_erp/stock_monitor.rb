@@ -2,15 +2,13 @@ module OpenErp
   class StockMonitor
     class << self
       def run!(payload)
-        product_id = ProductProduct.find(:all, fields: ['code']).find { |p| p.code == payload['sku'] }.try(:id)
+        unless product = ProductProduct.first(fields: ['default_code', '=', payload[:inventory][:sku]])
+          raise OpenErpEndpointError, "Could not find inventory for #{payload[:inventory][:id]}"
+        end
 
-        raise OpenErpEndpointError, "Product #{payload['sku']} could not be found on OpenERP!" unless product_id
-
-        product = ProductProduct.find(product_id)
-
-        return {
-          'sku' => payload['sku'],
-          'quantity' => product.qty_available.to_i
+        {
+          sku: payload[:inventory][:sku],
+          quantity: product.qty_available.to_i
         }
       end
     end

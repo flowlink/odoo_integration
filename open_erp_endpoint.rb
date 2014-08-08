@@ -53,14 +53,14 @@ class OpenErpEndpoint < EndpointBase::Sinatra::Base
   post '/get_inventory' do
     begin
       code = 200
-      response = @client.update_stock(@payload)
-      add_message 'stock:actual', response
-
-      set_summary "Stock updated for product #{@payload['sku']}. This products count on hand now reflects the inventory_qty from OpenERP."
+      stock = @client.update_stock(@payload)
+      add_object 'inventory', stock
+      set_summary "Inventory #{@payload[:inventory][:sku]} updated"
     rescue => e
       code = 500
-      error_notification(e)
+      set_summary e.message
     end
+
     process_result code
   end
 
