@@ -22,11 +22,8 @@ group :production do
   gem 'unicorn'
 end
 
-group :development do
-  gem 'shotgun'
+group :development, :test do
   gem 'pry'
-  gem 'guard-rspec'
-  gem 'terminal-notifier-guard'
 end
 
 gem 'endpoint_base', github: 'spree/endpoint_base'
