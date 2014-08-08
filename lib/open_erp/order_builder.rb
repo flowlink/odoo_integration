@@ -11,8 +11,8 @@ module OpenErp
       raise OpenErpEndpointError, "All products in the order must exist on OpenERP!" unless validate_line_items?
 
       order = SaleOrder.new({
-        name: payload['order']['number'],
-        date_order: Time.parse(payload['order']['placed_on']).strftime('%Y-%m-%e'),
+        name: payload[:order][:id],
+        date_order: Time.parse(payload['order']['placed_on']).strftime('%Y-%m-%d'),
         state: "done",
         invoice_quantity: "order"
       })
@@ -31,11 +31,19 @@ module OpenErp
       order.incoterm = StockIncoterms.find(:all, :domain => ['name', '=', config['openerp_shipping_name']]).first.try(:id)
       update_totals(order)
 
+      # NOTE return here if order is not saved
       order.save
+
+      # NOTE Check whether it's possible to sales order lines along with
+      # the order in one single call
+
       set_line_items(order)
-      create_shipping_line(order)
+
+      # NOTE Wombat default order object has no shipments
+      # create_shipping_line(order)
       create_taxes_line(order)
       create_discount_line(order)
+
       order.reload
     end
 
@@ -54,7 +62,6 @@ module OpenErp
     end
 
     private
-
       def validate_line_items?
         !payload[:order][:line_items].any? do |line_item|
           ::ProductProduct.find(name: line_item['name']).length < 1
@@ -72,18 +79,18 @@ module OpenErp
       end
 
       def set_line_items(order)
-        payload['original']['line_items'].each do |li|
+        payload[:order][:line_items].each do |li|
           create_line(li, order)
         end
       end
 
       def update_line_items(order)
-        payload['original']['line_items'].each do |li|
-          line = order.order_line.find { |line| line.name == li['name'] }
+        payload[:order][:line_items].each do |li|
+          line = order.order_line.find { |line| line.name == li[:name] }
           if line
-            line.product_id = ProductProduct.find(name: li['name']).first.id
-            line.product_uom_qty = li['quantity'].to_f
-            line.price_unit = li['price']
+            line.product_id = ProductProduct.find(name: li[:name]).first.id
+            line.product_uom_qty = li[:quantity].to_f
+            line.price_unit = li[:price]
             line.save
           else
             create_line(li, order)
@@ -94,10 +101,10 @@ module OpenErp
       def create_line(line_payload, order)
         line = SaleOrderLine.new
         line.order_id = order.id
-        line.name = line_payload['variant']['name']
-        line.product_id = ProductProduct.find(name: line_payload['variant']['name']).first.id
-        line.product_uom_qty = line_payload['quantity'].to_f
-        line.price_unit = line_payload['price']
+        line.name = line_payload[:name]
+        line.product_id = ProductProduct.find(name: line_payload[:name]).first.id
+        line.product_uom_qty = line_payload[:quantity].to_f
+        line.price_unit = line_payload[:price]
         line.save
       end
 
@@ -111,22 +118,22 @@ module OpenErp
       end
 
       def create_discount_line(order)
-        discount_adjustments = payload['order']['adjustments'].find_all do |adjustment|
-          adjustment['value'].to_f < 0
+        discount_adjustments = payload[:order][:adjustments].find_all do |adjustment|
+          adjustment[:value].to_f < 0
         end
-        return unless discount_adjustments
+
+        return if discount_adjustments.empty?
 
         line = SaleOrderLine.new
         line.order_id = order.id
         line.name = "Discounts"
         line.product_uom_qty = 1.0
-        line.price_unit = discount_adjustments.sum { |adj| adj['value'] }
+        line.price_unit = discount_adjustments.map { |adj| adj[:value] }.reduce :+
         line.save
       end
 
       def create_shipping_line(order)
-        shipment_numbers = payload['order']['shipments']
-          .map { |shipment| shipment['number'] }.join(', ')
+        shipment_numbers = payload['order']['shipments'].map { |shipment| shipment['number'] }.join(', ')
         line = SaleOrderLine.new
         line.order_id = order.id
         line.name = "Shipping - #{shipment_numbers}"

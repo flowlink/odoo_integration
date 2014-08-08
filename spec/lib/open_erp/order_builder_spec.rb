@@ -3,10 +3,10 @@ require 'spec_helper'
 describe OpenErp::OrderBuilder do
   before(:all) do
     VCR.use_cassette('ooor') do
-      Ooor.new url: ENV['OERP_URL'],
-               database: ENV['OERP_DB'],
-               username: ENV['OERP_USER'],
-               password: ENV['OERP_PASS']
+      Ooor.new url: ENV['OPENERP_URL'],
+               database: ENV['OPENERP_DB'],
+               username: ENV['OPENERP_USER'],
+               password: ENV['OPENERP_PASS']
     end
   end
 
@@ -23,10 +23,6 @@ describe OpenErp::OrderBuilder do
 
   describe "#build!" do
     it "sets the required attributes" do
-      subject.should_receive(:create_taxes_line).and_call_original
-      subject.should_receive(:create_shipping_line).and_call_original
-      subject.should_receive(:create_discount_line).and_call_original
-
       VCR.use_cassette('build_order') do
         order = subject.build!
         expect(order).to be_persisted

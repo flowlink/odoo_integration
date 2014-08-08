@@ -11,10 +11,10 @@ module Factory
 
     def config
       {
-        'openerp_api_user'                   => ENV['OERP_USER'],
-        'openerp_api_password'               => ENV['OERP_PASS'],
-        'openerp_api_database'               => ENV['OERP_DB'],
-        'openerp_api_url'                    => ENV['OERP_URL'],
+        'openerp_api_user'                   => ENV['OPENERP_USER'],
+        'openerp_api_password'               => ENV['OPENERP_PASS'],
+        'openerp_api_database'               => ENV['OPENERP_DB'],
+        'openerp_api_url'                    => ENV['OPENERP_URL'],
         'openerp_shop'                       => '1',
         'openerp_shipping_policy'            => 'Deliver all products at once',
         'openerp_shipping_name'              => 'FREE CARRIER',
