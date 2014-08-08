@@ -7,13 +7,12 @@ module OpenErp
       @config  = config
     end
 
-
     def build!
       raise OpenErpEndpointError, "All products in the order must exist on OpenERP!" unless validate_line_items?
 
       order = SaleOrder.new({
         name: payload['order']['number'],
-        date_order: Time.parse(payload['order']['updated_at']).strftime('%Y-%m-%e'),
+        date_order: Time.parse(payload['order']['placed_on']).strftime('%Y-%m-%e'),
         state: "done",
         invoice_quantity: "order"
       })
@@ -25,7 +24,9 @@ module OpenErp
       order.shipped = payload['order']['status'] == 'complete' ? true : false
       order.partner_invoice_id = order.partner_id
       order.partner_shipping_id = set_partner_shipping_id(payload['order']['email'], order)
+
       order.shop_id = SaleShop.find(id: config['openerp_shop'].to_i).first.id
+
       order.pricelist_id = set_pricelist(config['openerp_pricelist'])
       order.incoterm = StockIncoterms.find(:all, :domain => ['name', '=', config['openerp_shipping_name']]).first.try(:id)
       update_totals(order)
@@ -78,9 +79,9 @@ module OpenErp
 
       def update_line_items(order)
         payload['original']['line_items'].each do |li|
-          line = order.order_line.find { |line| line.name == li['variant']['name'] }
+          line = order.order_line.find { |line| line.name == li['name'] }
           if line
-            line.product_id = ProductProduct.find(name: li['variant']['name']).first.id
+            line.product_id = ProductProduct.find(name: li['name']).first.id
             line.product_uom_qty = li['quantity'].to_f
             line.price_unit = li['price']
             line.save

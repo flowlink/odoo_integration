@@ -31,7 +31,7 @@ class OpenErpEndpoint < EndpointBase::Sinatra::Base
       set_summary "The order #{@payload['order']['number']} was sent to OpenERP as #{response.name}."
     rescue => e
       code = 500
-      set_summary e.message
+      set_summary e.message << "\n\n\n" << e.backtrace.join("\n")
     end
 
     process_result code
