@@ -7,6 +7,7 @@ module OpenErp
         end
 
         {
+          id: payload[:inventory][:id],
           sku: payload[:inventory][:sku],
           quantity: product.qty_available.to_i
         }
