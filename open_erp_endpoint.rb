@@ -1,72 +1,73 @@
+require "sinatra"
+require "endpoint_base"
+
 require_relative './lib/open_erp'
 
 class OpenErpEndpoint < EndpointBase::Sinatra::Base
   set :logging, true
 
   before do
+    models = if request.path_info.include? "order"
+               ["sale.order", "sale.shop", "stock.incoterms", "sale.order.line",
+                "res.currency", "res.partner", "product.pricelist",
+                "res.country", "res.country.state", "product.product"]
+             else
+               ["product.product"]
+             end
+
     @client = OpenErp::Client.new(
       url: @config['openerp_api_url'],
       database: @config['openerp_api_database'],
       username: @config['openerp_api_user'],
       password: @config['openerp_api_password'],
-      models: ['product.product']
+      models: models
     )
   end
 
   post '/get_products' do
     begin
-      code = 200
+      products = @client.import_products
+      products.each { |p| add_object 'product', p }
 
-      @client.import_products.each do |product|
-        add_object 'product', product
-      end
+      line = if (count = products.count) > 0
+               "Updating #{count} #{"product".pluralize count} from OpenERP"
+             else
+               "No product to import found"
+             end
 
-      set_summary 'All products waiting for import from OpenERP have been imported.'
+      result 200, line
     rescue => e
-      code = 500
-      set_summary e.message
+      result 500, e.message
     end
-    process_result code
   end
 
   post '/add_order' do
     begin
-      code = 200
       response = @client.send_order(@payload, @config)
-      set_summary "The order #{@payload['order']['number']} was sent to OpenERP as #{response.name}."
+      result 200, "The order #{@payload['order']['number']} was sent to OpenERP as #{response.name}."
     rescue => e
-      code = 500
-      set_summary e.message << "\n\n\n" << e.backtrace.join("\n")
+      result 500, e.message
     end
-
-    process_result code
   end
 
   post '/update_order' do
     begin
-      code = 200
       response = @client.send_updated_order(@payload, @config)
-      set_summary "The order #{@payload['order']['number']} was sent to OpenERP as #{response.name}."
+      result 200, "The order #{@payload['order']['number']} was sent to OpenERP as #{response.name}."
     rescue => e
-      code = 500
-      set_summary e.message
+      result 500, e.message
     end
-
-    process_result code
   end
 
   post '/get_inventory' do
     begin
-      code = 200
       stock = @client.update_stock(@payload)
       add_object 'inventory', stock
-      set_summary "Inventory #{@payload[:inventory][:sku]} updated"
-    rescue => e
-      code = 500
-      set_summary e.message
-    end
 
-    process_result code
+      result 200, "Inventory #{@payload[:inventory][:sku]} updated"
+    rescue => e
+      result 500, e.message
+    end
   end
 
   post '/confirm_shipment' do

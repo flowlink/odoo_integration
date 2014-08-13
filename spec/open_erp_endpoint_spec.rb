@@ -1,44 +1,40 @@
 require 'spec_helper'
 
 describe OpenErpEndpoint do
-  def app
-    OpenErpEndpoint
-  end
+  let(:order) { Factory.order_payload }
+  let(:params) { Factory.config }
 
-  let(:order) { Factories.order }
-  let(:params) { Factories.parameters }
+  describe 'orders > sale order' do
+    it 'sends the order to OpenERP' do
+      order[:id] = "R45432522354"
+      order[:placed_on] = "2014-08-13T00:29:15.219Z"
 
-  describe '/order_export' do
-    context 'new order' do
-      context 'success' do
-        it 'sends the order to OpenERP' do
-          message = {
-            order: order,
-            parameters: params
-          }.to_json
+      message = {
+        order: order,
+        parameters: params
+      }.to_json
 
-          VCR.use_cassette('order_export_success') do
-            post '/add_order', message, auth
-            last_response.status.should == 200
-            last_response.body.should match /was sent to OpenERP/
-          end
-        end
+      VCR.use_cassette('orders/add_order') do
+        post '/add_order', message, auth
+        last_response.status.should == 200
+        last_response.body.should match /was sent to OpenERP/
       end
     end
 
     context 'updated order' do
-      context 'success' do
-        it 'sends the order to OpenERP' do
-          message = {
-            order: order,
-            parameters: params
-          }.to_json
+      it 'sends the order to OpenERP' do
+        order[:id] = "R45432522354"
+        order[:placed_on] = "2014-08-13T00:29:15.219Z"
 
-          VCR.use_cassette('order_export_update_success') do
-            post '/update_order', message, auth
-            last_response.status.should == 200
-            last_response.body.should match /was sent to OpenERP/
-          end
+        message = {
+          order: order,
+          parameters: params
+        }.to_json
+
+        VCR.use_cassette('orders/update_order') do
+          post '/update_order', message, auth
+          last_response.status.should == 200
+          last_response.body.should match /was sent to OpenERP/
         end
       end
     end
@@ -46,15 +42,19 @@ describe OpenErpEndpoint do
 
   describe '/get_inventory' do
     context 'success' do
-      it 'generates a stock actual message for a changed product' do
+      it 'gives back inventory stock for given object' do
         message = {
-          sku: 'ROR-00011',
+          inventory: {
+            id: '123',
+            sku: 'ROR-00011'
+          },
           parameters: params
         }.to_json
 
-        VCR.use_cassette('monitor_stock_success') do
+        VCR.use_cassette('inventory/get') do
           post '/get_inventory', message, auth
           last_response.status.should == 200
+          expect(json_response[:inventories].count).to eq 1
         end
       end
     end
@@ -62,20 +62,22 @@ describe OpenErpEndpoint do
     context 'failure' do
       it 'returns an error notification if the product does not exist on OpenERP' do
         message = {
-          sku: 'ROR-99999',
+          inventory: {
+            sku: "not there never there not there"
+          },
           parameters: params
         }.to_json
 
-        VCR.use_cassette('monitor_stock_no_product') do
+        VCR.use_cassette('inventory/product_not_found') do
           post '/get_inventory', message, auth
           last_response.status.should == 500
-          last_response.body.should match /OpenERP Endpoint error/
+          expect(json_response[:summary]).to match "Could not find inventory for"
         end
       end
     end
   end
 
-  describe '/confirm_shipment' do
+  pending '/get_shipments' do
     context 'success' do
       it 'generates a shipment confirm message for a shipped order' do
         message = {
@@ -94,18 +96,12 @@ describe OpenErpEndpoint do
   end
 
   describe '/get_products' do
-    context 'success' do
-      it 'generates a product:import for an imported product' do
-        message = {
-          parameters: params
-        }.to_json
-
-        VCR.use_cassette('import_product_success') do
-          post '/get_products', message, auth
-          last_response.status.should == 200
-          last_response.body.should match /Imported products/
-          last_response.body.should match /product:import/
-        end
+    it 'returns product objects' do
+      VCR.use_cassette('products/get') do
+        post '/get_products', { parameters: params }.to_json, auth
+        last_response.status.should == 200
+        binding.pry
+        expect(json_response[:products].count).to be > 1
       end
     end
   end

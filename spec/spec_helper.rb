@@ -10,10 +10,6 @@ Dir["./spec/support/**/*.rb"].each { |f| require f }
 
 Sinatra::Base.environment = 'test'
 
-def app
-  OpenErpEndpoint
-end
-
 ENV['OPENERP_URL'] ||= "http://staging.example.com"
 ENV['OPENERP_DB'] ||= "db"
 ENV['OPENERP_USER'] ||= "user"

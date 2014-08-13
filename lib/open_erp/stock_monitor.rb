@@ -3,7 +3,7 @@ module OpenErp
     class << self
       def run!(payload)
         unless product = ProductProduct.find(:all, domain: ['default_code', '=', payload[:inventory][:sku]]).first
-          raise OpenErpEndpointError, "Could not find inventory for #{payload[:inventory][:id]}"
+          raise OpenErpEndpointError, "Could not find inventory for #{payload[:inventory][:sku]}"
         end
 
         {
