@@ -2,7 +2,7 @@ module OpenErp
   class StockMonitor
     class << self
       def run!(payload)
-        unless product = ProductProduct.first(fields: ['default_code', '=', payload[:inventory][:sku]])
+        unless product = ProductProduct.find(:all, domain: ['default_code', '=', payload[:inventory][:sku]]).first
           raise OpenErpEndpointError, "Could not find inventory for #{payload[:inventory][:id]}"
         end
 
