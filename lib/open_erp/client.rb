@@ -2,9 +2,8 @@ module OpenErp
   class Client
     attr_reader :client
 
-    def initialize(url, database, username, password)
-      @client = Ooor.new url: url,           database: database,
-                         username: username, password: password
+    def initialize(params)
+      @client = Ooor.new(params)
     rescue
       raise OpenErpEndpointError, 'There was a problem establishing a connection to OpenERP.
         Please ensure your credentials are valid.'

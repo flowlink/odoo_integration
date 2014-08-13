@@ -4,8 +4,13 @@ class OpenErpEndpoint < EndpointBase::Sinatra::Base
   set :logging, true
 
   before do
-    @client = OpenErp::Client.new(@config['openerp_api_url'], @config['openerp_api_database'],
-                                  @config['openerp_api_user'], @config['openerp_api_password'])
+    @client = OpenErp::Client.new(
+      url: @config['openerp_api_url'],
+      database: @config['openerp_api_database'],
+      username: @config['openerp_api_user'],
+      password: @config['openerp_api_password'],
+      models: ['product.product']
+    )
   end
 
   post '/get_products' do
