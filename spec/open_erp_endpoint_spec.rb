@@ -45,8 +45,7 @@ describe OpenErpEndpoint do
       it 'gives back inventory stock for given object' do
         message = {
           inventory: {
-            id: '123',
-            sku: 'ROR-00011'
+            id: 'ROR-00011',
           },
           parameters: params
         }.to_json
@@ -63,7 +62,7 @@ describe OpenErpEndpoint do
       it 'returns an error notification if the product does not exist on OpenERP' do
         message = {
           inventory: {
-            sku: "not there never there not there"
+            id: "not there never there not there"
           },
           parameters: params
         }.to_json

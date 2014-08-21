@@ -16,7 +16,7 @@ describe OpenErp::StockMonitor do
   let(:payload) do
     {
       inventory: {
-        sku: product[:sku]
+        id: product[:id]
       },
       parameters: config
     }.with_indifferent_access
@@ -29,18 +29,19 @@ describe OpenErp::StockMonitor do
           result = OpenErp::StockMonitor.run! payload
           result.should be_a Hash
 
-          result[:sku].should == product[:sku]
-          # result[:quantity].should == 50
+          result[:id].should == product[:id]
         end
       end
     end
 
     context 'when the product does not exist' do
       it 'raises an error' do
-        payload[:inventory][:sku] = 'NOTASKU'
+        payload[:inventory][:id] = 'NOTASKU'
 
         VCR.use_cassette('monitor_stock_failure') do
-          expect { OpenErp::StockMonitor.run!(payload) }.to raise_error(OpenErpEndpointError)
+          expect {
+            OpenErp::StockMonitor.run!(payload)
+          }.to raise_error(OpenErpEndpointError)
         end
       end
     end
