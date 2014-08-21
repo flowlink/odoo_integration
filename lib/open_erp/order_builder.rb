@@ -18,8 +18,8 @@ module OpenErp
         invoice_quantity: "order"
       })
 
-      set_picking_policy(order, config['shipping_policy'])
-      set_order_policy(order, config['invoice_policy'])
+      set_picking_policy(order, config['openerp_shipping_policy'])
+      set_order_policy(order, config['openerp_invoice_policy'])
       set_currency(order, payload['order']['currency'])
       set_customer(order, payload['order']['email'])
       order.shipped = payload['order']['status'] == 'complete' ? true : false
