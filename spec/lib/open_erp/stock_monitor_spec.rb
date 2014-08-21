@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe OpenErp::StockMonitor do
-  before(:all) do
+  before do
     VCR.use_cassette('ooor') do
       Ooor.new url:      ENV['OPENERP_URL'],
                database: ENV['OPENERP_DB'],
@@ -16,9 +16,9 @@ describe OpenErp::StockMonitor do
   let(:payload) do
     {
       inventory: {
-        sku: product[:sku],
-        parameters: config
-      }
+        sku: product[:sku]
+      },
+      parameters: config
     }.with_indifferent_access
   end
 
@@ -37,9 +37,10 @@ describe OpenErp::StockMonitor do
 
     context 'when the product does not exist' do
       it 'raises an error' do
-        @payload['sku'] = 'NOTASKU'
+        payload[:inventory][:sku] = 'NOTASKU'
+
         VCR.use_cassette('monitor_stock_failure') do
-          expect { OpenErp::StockMonitor.run!(@payload) }.to raise_error(OpenErpEndpointError)
+          expect { OpenErp::StockMonitor.run!(payload) }.to raise_error(OpenErpEndpointError)
         end
       end
     end

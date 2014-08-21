@@ -25,8 +25,8 @@ describe OpenErp::ProductImporter do
         result = described_class.run!
         result.should be_a Array
         result.length.should == 2
-        result.first[:product][:name].should == product.name
-        result.last[:product][:variants].first[:name].should == variant_product.variants
+        result.first[:name].should == product.name
+        result.last[:variants].first[:name].should == variant_product.variants
       end
 
       context 'when a variant is found' do
@@ -36,18 +36,18 @@ describe OpenErp::ProductImporter do
           result = described_class.run!
           result.should be_a Array
           result.length.should == 1
-          result.first[:product][:variants].first[:name].should == variant_product.variants
+          result.first[:variants].first[:name].should == variant_product.variants
         end
 
         it 'uses the permalink as the master product sku' do
           result = described_class.run!
-          result.first[:product][:name].should == variant_product.name
+          result.first[:name].should == variant_product.name
         end
 
         it "returns proper options for the variant" do
           result = described_class.run!
-          result.first[:product][:variants].first[:options].first.first[0].should == "a-variant"
-          result.first[:product][:variants].first[:options].first.first[1].should == variant_product.variants
+          result.first[:variants].first[:options].first[0].should == "a-variant"
+          result.first[:variants].first[:options].first[1].should == variant_product.variants
         end
       end
     end

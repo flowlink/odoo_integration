@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe OpenErp::OrderBuilder do
-  before(:all) do
+  before do
     VCR.use_cassette('ooor') do
       Ooor.new url: ENV['OPENERP_URL'],
                database: ENV['OPENERP_DB'],
@@ -19,6 +19,8 @@ describe OpenErp::OrderBuilder do
 
   describe "#build!" do
     it "sets the required attributes" do
+      payload[:order][:id] = "R45345899878976"
+
       VCR.use_cassette('build_order') do
         order = subject.build!
         expect(order).to be_persisted
