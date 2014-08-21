@@ -70,16 +70,14 @@ class OpenErpEndpoint < EndpointBase::Sinatra::Base
     end
   end
 
-  post '/confirm_shipment' do
+  post '/get_shipments' do
     begin
-      code = 200
-      response = @client.confirm_shipment
-      add_messages 'shipment:confirm', response, :inflate => true
-      set_summary 'All pending shipments from OpenERP have been marked as shipped.'
+      shipments = @client.confirm_shipment
+      shipments.each { |s| add_object 'shipment', s }
+
+      result 200, 'All pending shipments from OpenERP have been marked as shipped.'
     rescue => e
-      code = 500
-      set_summary "An OpenERP Endpoint error has occured: #{e.message}"
+      result 500, "An OpenERP Endpoint error has occured: #{e.message}"
     end
-    process_result code
   end
 end
