@@ -11,6 +11,8 @@ class OpenErpEndpoint < EndpointBase::Sinatra::Base
                ["sale.order", "sale.shop", "stock.incoterms", "sale.order.line",
                 "res.currency", "res.partner", "product.pricelist",
                 "res.country", "res.country.state", "product.product"]
+             elsif request.path_info.include? "shipment"
+               ["sale.order"]
              else
                ["product.product"]
              end
