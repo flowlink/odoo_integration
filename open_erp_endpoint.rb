@@ -7,23 +7,25 @@ class OpenErpEndpoint < EndpointBase::Sinatra::Base
   set :logging, true
 
   before do
-    models = if request.path_info.include? "order"
-               ["sale.order", "sale.shop", "stock.incoterms", "sale.order.line",
-                "res.currency", "res.partner", "product.pricelist",
-                "res.country", "res.country.state", "product.product"]
-             elsif request.path_info.include? "shipment"
-               ["sale.order"]
-             else
-               ["product.product"]
-             end
+    if @config
+      models = if request.path_info.include? "order"
+                 ["sale.order", "sale.shop", "stock.incoterms", "sale.order.line",
+                  "res.currency", "res.partner", "product.pricelist",
+                  "res.country", "res.country.state", "product.product"]
+               elsif request.path_info.include? "shipment"
+                 ["sale.order"]
+               else
+                 ["product.product"]
+               end
 
-    @client = OpenErp::Client.new(
-      url: @config['openerp_api_url'],
-      database: @config['openerp_api_database'],
-      username: @config['openerp_api_user'],
-      password: @config['openerp_api_password'],
-      models: models
-    )
+      @client = OpenErp::Client.new(
+        url: @config['openerp_api_url'],
+        database: @config['openerp_api_database'],
+        username: @config['openerp_api_user'],
+        password: @config['openerp_api_password'],
+        models: models
+      )
+    end
   end
 
   post '/get_products' do
