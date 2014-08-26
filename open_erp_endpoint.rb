@@ -33,13 +33,11 @@ class OpenErpEndpoint < EndpointBase::Sinatra::Base
       products = @client.import_products
       products.each { |p| add_object 'product', p }
 
-      line = if (count = products.count) > 0
-               "Updating #{count} #{"product".pluralize count} from OpenERP"
-             else
-               "No product to import found"
-             end
-
-      result 200, line
+      if (count = products.count) > 0
+        result 200, "Received #{count} #{"product".pluralize count} from OpenERP"
+      else
+        result 200
+      end
     rescue => e
       result 500, e.message
     end
