@@ -99,6 +99,19 @@ module OpenErp
         end
       end
 
+      # NOTE Watch out for creating taxes on the fly. Account need special
+      # credentials, see example error:
+      #
+      #   => AccountTax.create(name: "Spec Tax", amount: 10)
+      #
+      #   Sorry, you are not allowed to create this kind of document. Only users
+      #   with the following access level are currently allowed to do that:
+      #
+      #   - Accounting & Finance/Financial Manager
+      #   
+      #   (Document model: account.tax)
+      #   OpenERP Server Error
+      #
       def create_line(line_payload, order)
         line = SaleOrderLine.new
         line.order_id = order.id

@@ -11,7 +11,8 @@ class OpenErpEndpoint < EndpointBase::Sinatra::Base
       models = if request.path_info.include? "order"
                  ["sale.order", "sale.shop", "stock.incoterms", "sale.order.line",
                   "res.currency", "res.partner", "product.pricelist",
-                  "res.country", "res.country.state", "product.product"]
+                  "res.country", "res.country.state", "product.product",
+                  "account.tax"]
                elsif request.path_info.include? "shipment"
                  ["sale.order"]
                else
