@@ -114,6 +114,7 @@ module OpenErp
       #
       def create_line(line_payload, order)
         line = SaleOrderLine.new
+        line.tax_id = line_payload[:tax_id] if line_payload[:tax_id]
         line.order_id = order.id
         line.name = line_payload[:name]
         line.product_id = ProductProduct.find(name: line_payload[:name]).first.id
