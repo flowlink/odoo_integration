@@ -22,6 +22,7 @@ module OpenErp
       set_order_policy(order, config['openerp_invoice_policy'])
       set_currency(order, payload['order']['currency'])
       set_customer(order, payload['order']['email'])
+
       order.shipped = payload['order']['status'] == 'complete' ? true : false
       order.partner_invoice_id = order.partner_id
       order.partner_shipping_id = set_partner_shipping_id(payload['order']['email'], order)
@@ -66,7 +67,7 @@ module OpenErp
     private
       def validate_line_items?
         !payload[:order][:line_items].any? do |line_item|
-          ::ProductProduct.find(name: line_item['name']).length < 1
+          ::ProductProduct.find(default_code: line_item[:product_id]).length < 1
         end
       end
 
@@ -87,10 +88,12 @@ module OpenErp
 
       def update_line_items(order)
         payload[:order][:line_items].each do |li|
-          line = order.order_line.find { |line| line.name == li[:name] }
+
+          line = order.order_line.find { |line| line.product_id == li[:product_id] }
+
           if line
-            line.product_id = ProductProduct.find(name: li[:name]).first.id
-            line.tax_id = line_payload[:tax_id].to_s.split(",") if line_payload[:tax_id]
+            line.product_id = ProductProduct.find(default_code: line[:product_id]).first.id
+            line.tax_id = line_payload[:tax_id].to_s.split(",") if line[:tax_id]
             line.product_uom_qty = li[:quantity].to_f
             line.price_unit = li[:price]
             line.save
@@ -118,7 +121,7 @@ module OpenErp
         line.tax_id = line_payload[:tax_id].to_s.split(",") if line_payload[:tax_id]
         line.order_id = order.id
         line.name = line_payload[:name]
-        line.product_id = ProductProduct.find(name: line_payload[:name]).first.id
+        line.product_id = ProductProduct.find(default_code: line_payload[:product_id]).first.id
         line.product_uom_qty = line_payload[:quantity].to_f
         line.price_unit = line_payload[:price]
         line.save
