@@ -90,6 +90,7 @@ module OpenErp
           line = order.order_line.find { |line| line.name == li[:name] }
           if line
             line.product_id = ProductProduct.find(name: li[:name]).first.id
+            line.tax_id = line_payload[:tax_id].to_s.split(",") if line_payload[:tax_id]
             line.product_uom_qty = li[:quantity].to_f
             line.price_unit = li[:price]
             line.save
@@ -114,7 +115,7 @@ module OpenErp
       #
       def create_line(line_payload, order)
         line = SaleOrderLine.new
-        line.tax_id = line_payload[:tax_id] if line_payload[:tax_id]
+        line.tax_id = line_payload[:tax_id].to_s.split(",") if line_payload[:tax_id]
         line.order_id = order.id
         line.name = line_payload[:name]
         line.product_id = ProductProduct.find(name: line_payload[:name]).first.id
