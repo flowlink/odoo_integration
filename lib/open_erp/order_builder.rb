@@ -1,15 +1,19 @@
 module OpenErp
   class OrderBuilder
-    attr_reader :payload, :config, :order
+    attr_reader :payload, :config, :order, :products
 
     def initialize(payload, config)
       @payload = payload
+
       @order = payload[:order]
-      @config  = config
+      @config = config
+      @products = []
     end
 
     def build!
-      raise OpenErpEndpointError, "All products in the order must exist on OpenERP!" unless validate_line_items?
+      unless validate_line_items?
+        raise OpenErpEndpointError, "All products in the order must exist on OpenERP"
+      end
 
       order = SaleOrder.new({
         name: payload[:order][:id],
@@ -50,7 +54,9 @@ module OpenErp
     end
 
     def update!
-      raise OpenErpEndpointError, "All products in the order must exist on OpenERP!" unless validate_line_items?
+      unless validate_line_items?
+        raise OpenErpEndpointError, "All products in the order must exist on OpenERP"
+      end
 
       order = find_order
       order.partner_id = set_customer(order, payload['order']['email'])
@@ -67,7 +73,9 @@ module OpenErp
     private
       def validate_line_items?
         !payload[:order][:line_items].any? do |line_item|
-          ::ProductProduct.find(default_code: line_item[:product_id]).length < 1
+          result = ProductProduct.find(default_code: line_item[:product_id]).to_a
+          products.push result.first if result.first
+          result.length < 1
         end
       end
 
@@ -92,7 +100,7 @@ module OpenErp
           line = order.order_line.find { |line| line.product_id == li[:product_id] }
 
           if line
-            line.product_id = ProductProduct.find(default_code: line[:product_id]).first.id
+            line.product_id = products.find { |p| p.default_code == line[:product_id] }.id
             line.tax_id = line_payload[:tax_id].to_s.split(",") if line[:tax_id]
             line.product_uom_qty = li[:quantity].to_f
             line.price_unit = li[:price]
@@ -121,7 +129,7 @@ module OpenErp
         line.tax_id = line_payload[:tax_id].to_s.split(",") if line_payload[:tax_id]
         line.order_id = order.id
         line.name = line_payload[:name]
-        line.product_id = ProductProduct.find(default_code: line_payload[:product_id]).first.id
+        line.product_id = products.find { |p| p.default_code == line_payload[:product_id] }.id
         line.product_uom_qty = line_payload[:quantity].to_f
         line.price_unit = line_payload[:price]
         line.save
