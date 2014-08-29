@@ -8,7 +8,7 @@ GIT
 
 GIT
   remote: git://github.com/spree/endpoint_base.git
-  revision: dac37b490353cea6ca2b06a1b1b81acc0af6888c
+  revision: 5a819541b20ade1b7ec6eb19f38fbab7eaf3e14e
   specs:
     endpoint_base (0.3)
       activesupport
@@ -56,7 +56,7 @@ GEM
     json (1.8.1)
     kgio (2.8.1)
     method_source (0.8.2)
-    minitest (5.4.0)
+    minitest (5.4.1)
     multi_json (1.10.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
@@ -107,7 +107,7 @@ GEM
       jbuilder
       tilt (<= 1.4.1)
     tins (0.13.1)
-    tzinfo (1.2.1)
+    tzinfo (1.2.2)
       thread_safe (~> 0.1)
     unicorn (4.7.0)
       kgio (~> 2.6)
