@@ -7,6 +7,7 @@ gem 'capistrano'
 
 gem 'httparty'
 gem 'ooor', github: 'akretion/ooor'
+gem 'honeybadger'
 
 group :test do
   gem 'vcr'
