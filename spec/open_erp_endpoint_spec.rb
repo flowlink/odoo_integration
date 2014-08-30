@@ -6,8 +6,8 @@ describe OpenErpEndpoint do
 
   describe 'orders > sale order' do
     it 'sends the order to OpenERP' do
-      order[:id] = "R45432522354"
-      order[:placed_on] = "2014-08-13T00:29:15.219Z"
+      order[:id] = "R454987982354345"
+      order[:placed_on] = "2014-08-29T00:29:15.219Z"
 
       message = {
         order: order,
@@ -23,8 +23,7 @@ describe OpenErpEndpoint do
 
     context 'updated order' do
       it 'sends the order to OpenERP' do
-        order[:id] = "R45432522354"
-        order[:placed_on] = "2014-08-13T00:29:15.219Z"
+        order[:id] = "R454987982354345"
 
         message = {
           order: order,
@@ -34,13 +33,13 @@ describe OpenErpEndpoint do
         VCR.use_cassette('orders/update_order') do
           post '/update_order', message, auth
           last_response.status.should == 200
-          last_response.body.should match /was sent to OpenERP/
+          last_response.body.should match /was updated in OpenERP/
         end
       end
     end
   end
 
-  describe '/get_inventory' do
+  pending '/get_inventory' do
     context 'success' do
       it 'gives back inventory stock for given object' do
         message = {
@@ -94,12 +93,11 @@ describe OpenErpEndpoint do
     end
   end
 
-  describe '/get_products' do
+  pending '/get_products' do
     it 'returns product objects' do
       VCR.use_cassette('products/get') do
         post '/get_products', { parameters: params }.to_json, auth
         last_response.status.should == 200
-        binding.pry
         expect(json_response[:products].count).to be > 1
       end
     end

@@ -22,7 +22,7 @@ describe OpenErp::StockMonitor do
     }.with_indifferent_access
   end
 
-  describe '.run!' do
+  pending '.run!' do
     context 'when the products exists' do
       it 'returns product sku and quantity as a hash' do
         VCR.use_cassette('monitor_stock_success') do

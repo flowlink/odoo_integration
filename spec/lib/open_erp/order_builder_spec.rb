@@ -10,7 +10,7 @@ describe OpenErp::OrderBuilder do
     end
   end
 
-  let(:payload) { { order: Factory.order_payload }.with_indifferent_access }
+  let(:payload) { { order: Factory.order_payload } }
   let(:config) { Factory.config }
 
   subject do

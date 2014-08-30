@@ -9,7 +9,7 @@ describe OpenErp::ShippingMonitor do
       order_line: [OpenStruct.new(name: "Shipping - H123, H234")]
   end
 
-  describe ".run!" do
+  pending ".run!" do
     it "returns shipments to process" do
       SaleOrder.should_receive(:find).exactly(:once).and_return([order])
       result = described_class.run!
@@ -25,13 +25,13 @@ describe OpenErp::ShippingMonitor do
     end
   end
 
-  describe ".find_order_shipments" do
+  pending ".find_order_shipments" do
     it "returns the shipment numbers from the order" do
       described_class.find_order_shipments(order).should == ["H123", "H234"]
     end
   end
 
-  describe ".shipments_to_shipment_confirm_messages" do
+  pending ".shipments_to_shipment_confirm_messages" do
     it "returns an array of shipment:confirm messages" do
       messages = described_class.shipments_to_shipment_confirm_messages(order)
       messages.length.should == 2
