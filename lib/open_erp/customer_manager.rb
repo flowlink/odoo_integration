@@ -53,7 +53,6 @@ module OpenErp
       ship_customer.city       = address['city']
       ship_customer.zip        = address['zipcode']
       ship_customer.phone      = address['phone']
-      ship_customer.state_id   = ResCountryState.find(name: address['state']).first.id if address['state']
       ship_customer.country_id = ResCountry.find(code: address['country']).first.id
 
       if address['state'].present?

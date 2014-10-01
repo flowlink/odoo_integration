@@ -85,7 +85,7 @@ module OpenErp
       end
 
       def find_order
-        return @sale_order if @sale_order ||= SaleOrder.find(name: "#{order[:id]}").first
+        return @sale_order if @sale_order ||= SaleOrder.find(name: "#{order_payload[:id]}").first
         raise OpenErpEndpointError, "Order #{order[:number]} could not be found on OpenErp!"
       end
 
