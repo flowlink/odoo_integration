@@ -1,11 +1,11 @@
 module OpenErp
   class OrderBuilder
-    attr_reader :payload, :config, :order, :products
+    attr_reader :payload, :config, :order_payload, :products
 
     def initialize(payload, config)
       @payload = payload
 
-      @order = payload[:order]
+      @order_payload = payload[:order]
       @config = config
       @products = []
     end
@@ -47,7 +47,8 @@ module OpenErp
 
       # NOTE Wombat default order object has no shipments
       # create_shipping_line(order)
-      create_taxes_line(order)
+
+      create_taxes_line(order) if order_payload['totals']['tax']
       create_discount_line(order)
 
       order.reload
