@@ -6,7 +6,7 @@ describe OpenErpEndpoint do
 
   describe 'orders > sale order' do
     it 'sends the order to OpenERP' do
-      order[:id] = "R454987982354345"
+      order[:id] = "R45498798235434509799987"
       order[:placed_on] = "2014-08-29T00:29:15.219Z"
 
       message = {
@@ -16,6 +16,26 @@ describe OpenErpEndpoint do
 
       VCR.use_cassette('orders/add_order') do
         post '/add_order', message, auth
+
+        last_response.status.should == 200
+        last_response.body.should match /was sent to OpenERP/
+      end
+    end
+
+    it 'sends order without state' do
+      order[:id] = "R4549879823543450979999"
+      order[:placed_on] = "2014-08-29T00:29:15.219Z"
+      order['shipping_address'].delete('state')
+      order['billing_address'].delete('state')
+
+      message = {
+        order: order,
+        parameters: params
+      }.to_json
+
+      VCR.use_cassette('orders/order_with_no_state') do
+        post '/add_order', message, auth
+
         last_response.status.should == 200
         last_response.body.should match /was sent to OpenERP/
       end

@@ -35,8 +35,11 @@ module OpenErp
       customer.city       = address['city']
       customer.zip        = address['zipcode']
       customer.phone      = address['phone']
-      customer.state_id   = ResCountryState.find(name: address['state']).first.id
       customer.country_id = ResCountry.find(code: address['country']).first.id
+
+      if address['state'].present?
+        customer.state_id = ResCountryState.find(name: address['state']).first.id
+      end
     end
 
     def create_shipping_customer
@@ -50,8 +53,13 @@ module OpenErp
       ship_customer.city       = address['city']
       ship_customer.zip        = address['zipcode']
       ship_customer.phone      = address['phone']
-      ship_customer.state_id   = ResCountryState.find(name: address['state']).first.id
+      ship_customer.state_id   = ResCountryState.find(name: address['state']).first.id if address['state']
       ship_customer.country_id = ResCountry.find(code: address['country']).first.id
+
+      if address['state'].present?
+        ship_customer.state_id = ResCountryState.find(name: address['state']).first.id
+      end
+
       ship_customer.save
     end
   end

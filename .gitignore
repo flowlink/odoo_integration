@@ -2,3 +2,4 @@
 *.swo
 tmp
 config/deploy.rb
+spec/cassetes/
