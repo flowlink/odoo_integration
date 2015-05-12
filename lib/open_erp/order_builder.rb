@@ -26,6 +26,7 @@ module OpenErp
       set_order_policy(order, config['openerp_invoice_policy'])
       set_currency(order, payload['order']['currency'])
       set_customer(order, payload['order']['email'])
+      order.partner_id = 98
 
       order.shipped = payload['order']['status'] == 'complete' ? true : false
       order.partner_invoice_id = order.partner_id
@@ -207,7 +208,7 @@ module OpenErp
                      OpenErp::CustomerManager.new(result.first, payload)
                    end
 
-        order.partner_id = 98 #customer.update!.id
+        order.partner_id = customer.update!.id
       end
 
       def set_partner_shipping_id(email, order)
