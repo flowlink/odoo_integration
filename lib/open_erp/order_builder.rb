@@ -28,10 +28,10 @@ module OpenErp
       set_customer(order, payload['order']['email'])
 
       order.shipped = payload['order']['status'] == 'complete' ? true : false
-      order.partner_invoice_id = 98 # order.partner_id
-      order.partner_shipping_id = 98 #set_partner_shipping_id(payload['order']['email'], order)
+      order.partner_invoice_id = order.partner_id
+      order.partner_shipping_id = set_partner_shipping_id(payload['order']['email'], order)
 
-      # order.shop_id = config['openerp_shop']
+      # order.shop_id = config['openerp_shop'] # is this needed? shop_id doesnt seem to exist anymore
 
       order.pricelist_id = set_pricelist(config['openerp_pricelist'])
       order.incoterm = StockIncoterms.find(:all, :domain => ['name', '=', config['openerp_shipping_name']]).first.try(:id)
@@ -207,7 +207,8 @@ module OpenErp
                      OpenErp::CustomerManager.new(result.first, payload)
                    end
 
-        order.partner_id = customer.update!.id
+        customer.update!
+        order.partner_id = customer.id
       end
 
       def set_partner_shipping_id(email, order)
