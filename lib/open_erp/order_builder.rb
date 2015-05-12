@@ -211,12 +211,12 @@ module OpenErp
       end
 
       def set_partner_shipping_id(email, order)
-        result = ResPartner.find(id: 98)
-        if result.length > 0
-          result.first.id
-        else
+        # result = ResPartner.find(email: email, type: 'delivery')
+        # if result.length > 0
+        #   result.first.id
+        # else
           order.partner_id
-        end
+        # end
       end
 
       def set_pricelist(pricelist)
