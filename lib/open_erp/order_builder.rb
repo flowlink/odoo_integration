@@ -213,11 +213,11 @@ module OpenErp
       def set_partner_shipping_id(email, order)
         
         # search by types
-        if order['shipping_address'] == order['billing_address']
+        # if payload['order']['shipping_address'] == payload['order']['billing_address']
           result = ResPartner.find(email: email, type: 'default')
-        else 
-          result = ResPartner.find(email: email, type: 'delivery')
-        end
+        # else 
+        #   result = ResPartner.find(email: email, type: 'delivery')
+        # end
 
         if result.length > 0
           result.first.id
