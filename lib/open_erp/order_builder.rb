@@ -43,7 +43,7 @@ module OpenErp
       # NOTE Check whether it's possible to sales order lines along with
       # the order in one single call
 
-      set_line_items(order)
+      # set_line_items(order)
 
       # NOTE Wombat default order object has no shipments
       # create_shipping_line(order)
