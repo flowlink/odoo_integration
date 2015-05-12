@@ -18,7 +18,7 @@ module OpenErp
     private
 
     def update_category
-      customer.categ_ids       = [4] # [6,0,[1,2,4]]
+      customer.category_id       = '4' # [6,0,[1,2,4]]
     end
 
     def update_addresses
