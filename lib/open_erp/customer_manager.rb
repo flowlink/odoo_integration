@@ -8,6 +8,7 @@ module OpenErp
     end
 
     def update!
+      update_category
       update_addresses
 
       customer.save
@@ -15,6 +16,10 @@ module OpenErp
     end
 
     private
+
+    def update_category
+      customer.category_id       = [4]
+    end
 
     def update_addresses
       if payload['order']['shipping_address'] == payload['order']['billing_address']
