@@ -207,7 +207,7 @@ module OpenErp
                      OpenErp::CustomerManager.new(result.first, payload)
                    end
 
-        customer.update!
+        customer = customer.update!
         order.partner_id = customer.id
       end
 
