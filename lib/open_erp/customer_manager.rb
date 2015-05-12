@@ -18,7 +18,7 @@ module OpenErp
     private
 
     def update_category
-      customer.category_id       = [4] # [6,0,[1,2,4]]
+      customer.category_id       = [4] # array of ids
     end
 
     def update_addresses
@@ -63,6 +63,8 @@ module OpenErp
       if address['state'].present?
         ship_customer.state_id = ResCountryState.find(name: address['state']).first.id
       end
+
+      ship_customer.category_id       = [4] # array of ids
 
       ship_customer.save
     end
