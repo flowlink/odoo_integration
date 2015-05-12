@@ -34,10 +34,10 @@ module OpenErp
       order.shop_id = config['openerp_shop']
 
       order.pricelist_id = set_pricelist(config['openerp_pricelist'])
-      order.incoterm = StockIncoterms.find(:all, :domain => ['name', '=', config['openerp_shipping_name']]).first.try(:id)
+      # order.incoterm = StockIncoterms.find(:all, :domain => ['name', '=', config['openerp_shipping_name']]).first.try(:id)
       # update_totals(order)
 
-      # NOTE return here if order is not saved
+      # # NOTE return here if order is not saved
       # order.save
 
       # # NOTE Check whether it's possible to sales order lines along with
