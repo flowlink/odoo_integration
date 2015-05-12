@@ -207,13 +207,13 @@ module OpenErp
                      OpenErp::CustomerManager.new(result.first, payload)
                    end
 
-        order.partner_id = customer.update!.id.to_i
+        order.partner_id = 98 # customer.update!.id.to_i
       end
 
       def set_partner_shipping_id(email, order)
         result = ResPartner.find(email: email, type: 'delivery')
         if result.length > 0
-          result.first.id
+          98
         else
           order.partner_id
         end
