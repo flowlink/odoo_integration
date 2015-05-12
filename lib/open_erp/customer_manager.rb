@@ -59,7 +59,7 @@ module OpenErp
         ship_customer.state_id = ResCountryState.find(name: address['state']).first.id
       end
 
-      ship_customer.category_id       = [] # [6,0,[1,2,4]]
+      ship_customer.category_id       = 0 # [6,0,[1,2,4]]
 
       ship_customer.save
     end
