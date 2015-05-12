@@ -207,8 +207,8 @@ module OpenErp
                      OpenErp::CustomerManager.new(result.first, payload)
                    end
 
-        order.partner_id = customer.update!.id
-        raise OpenErpEndpointError, "#{order.partner_id}, #{customer.update!.id}"
+        order.boom = customer.update!.id
+        raise OpenErpEndpointError, "#{order.boom}, #{customer.update!.id}"
       end
 
       def set_partner_shipping_id(email, order)
