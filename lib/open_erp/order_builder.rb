@@ -28,8 +28,8 @@ module OpenErp
       set_customer(order, payload['order']['email'])
 
       order.shipped = payload['order']['status'] == 'complete' ? true : false
-      order.partner_invoice_id = 98 #order.partner_id
-      order.partner_shipping_id = 98 # set_partner_shipping_id(payload['order']['email'], order)
+      order.partner_invoice_id = 198 #order.partner_id
+      order.partner_shipping_id = 198 # set_partner_shipping_id(payload['order']['email'], order)
 
       # order.shop_id = config['openerp_shop'] # is this needed? shop_id doesnt seem to exist anymore
 
