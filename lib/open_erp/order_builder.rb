@@ -200,7 +200,7 @@ module OpenErp
       end
 
       def set_customer(order, email)
-        result = ResPartner.find(id: 98)
+        result = ResPartner.find(email: email, type: 'default')
         customer = if result.empty?
                      OpenErp::CustomerManager.new(ResPartner.new, payload)
                    else
@@ -211,7 +211,7 @@ module OpenErp
       end
 
       def set_partner_shipping_id(email, order)
-        result = ResPartner.find(email: email, type: 'delivery')
+        result = ResPartner.find(id: 98)
         if result.length > 0
           result.first.id
         else
