@@ -35,7 +35,7 @@ module OpenErp
 
       order.pricelist_id = set_pricelist(config['openerp_pricelist'])
       order.incoterm = StockIncoterms.find(:all, :domain => ['name', '=', config['openerp_shipping_name']]).first.try(:id)
-      update_totals(order)
+      # update_totals(order)
 
       # NOTE return here if order is not saved
       # order.save
