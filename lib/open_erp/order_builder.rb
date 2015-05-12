@@ -213,7 +213,7 @@ module OpenErp
       def set_partner_shipping_id(email, order)
         result = ResPartner.find(email: email, type: 'delivery')
         if result.length > 0
-          98
+          result.first.id
         else
           @order.partner_id
         end
