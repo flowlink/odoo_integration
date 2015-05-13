@@ -27,31 +27,31 @@ module OpenErp
       set_currency(order, payload['order']['currency'])
       set_customer(order, payload['order']['email'])
 
-      # order.shipped = payload['order']['status'] == 'complete' ? true : false
-      # order.partner_invoice_id = 98 #order.partner_id
-      # order.partner_shipping_id = set_partner_shipping_id(payload['order']['email'], order)
+      order.shipped = payload['order']['status'] == 'complete' ? true : false
+      order.partner_invoice_id = 98 #order.partner_id
+      order.partner_shipping_id = set_partner_shipping_id(payload['order']['email'], order)
 
-      # # order.shop_id = config['openerp_shop'] # is this needed? shop_id doesnt seem to exist anymore
+      # order.shop_id = config['openerp_shop'] # is this needed? shop_id doesnt seem to exist anymore
 
-      # order.pricelist_id = set_pricelist(config['openerp_pricelist'])
-      # order.incoterm = StockIncoterms.find(:all, :domain => ['name', '=', config['openerp_shipping_name']]).first.try(:id)
-      # update_totals(order)
+      order.pricelist_id = set_pricelist(config['openerp_pricelist'])
+      order.incoterm = StockIncoterms.find(:all, :domain => ['name', '=', config['openerp_shipping_name']]).first.try(:id)
+      update_totals(order)
 
-      # # NOTE return here if order is not saved
-      # order.save
+      # NOTE return here if order is not saved
+      order.save
 
-      # # NOTE Check whether it's possible to sales order lines along with
-      # # the order in one single call
+      # NOTE Check whether it's possible to sales order lines along with
+      # the order in one single call
 
-      # set_line_items(order)
+      set_line_items(order)
 
-      # # NOTE Wombat default order object has no shipments
-      # # create_shipping_line(order)
+      # NOTE Wombat default order object has no shipments
+      # create_shipping_line(order)
 
-      # create_taxes_line(order) if order_payload['totals']['tax']
-      # create_discount_line(order)
+      create_taxes_line(order) if order_payload['totals']['tax']
+      create_discount_line(order)
 
-      # order.reload
+      order.reload
     end
 
     def update!
@@ -206,9 +206,8 @@ module OpenErp
                    else
                      OpenErp::CustomerManager.new(result.first, payload)
                    end
-
+        raise OpenErpEndpointError, "#{customer.update!.id}"
         order.partner_id = customer.update!.id
-        raise OpenErpEndpointError, "#{order.partner_id}, #{customer.update!.id}"
       end
 
       def set_partner_shipping_id(email, order)
