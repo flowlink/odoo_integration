@@ -206,8 +206,8 @@ module OpenErp
                    else
                      OpenErp::CustomerManager.new(result.first, payload)
                    end
-        # raise OpenErpEndpointError, "#{order.partner_id}"
-        order.partner_id = customer.update! #.id
+
+        order.partner_id = customer.update! # requires teh full partner object not the id: customer.update!.id (look in ooor_spec line 190)
       end
 
       def set_partner_shipping_id(email, order)
