@@ -206,8 +206,8 @@ module OpenErp
                    else
                      OpenErp::CustomerManager.new(result.first, payload)
                    end
-        order.boom = 98
-        raise OpenErpEndpointError, "#{order.boom}"
+        order.partner_id = [98]
+        raise OpenErpEndpointError, "#{order.partner_id}"
         order.partner_id = customer.update!.id
       end
 
