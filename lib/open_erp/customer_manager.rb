@@ -8,6 +8,7 @@ module OpenErp
     end
 
     def update!
+      update_category
       update_addresses
 
       customer.save
@@ -15,6 +16,10 @@ module OpenErp
     end
 
     private
+
+    def update_category
+      customer.category_id       = []
+    end
 
     def update_addresses
       if payload['order']['shipping_address'] == payload['order']['billing_address']
@@ -58,6 +63,8 @@ module OpenErp
       if address['state'].present?
         ship_customer.state_id = ResCountryState.find(name: address['state']).first.id
       end
+
+      ship_customer.category_id       = []
 
       ship_customer.save
     end
