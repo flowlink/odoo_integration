@@ -18,7 +18,7 @@ module OpenErp
       order = SaleOrder.new({
         name: payload[:order][:id],
         date_order: Time.parse(payload['order']['placed_on']).strftime('%Y-%m-%d'),
-        state: "done",
+        # state: "done",
         invoice_quantity: "order"
       })
 
