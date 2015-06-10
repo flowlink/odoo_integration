@@ -51,11 +51,12 @@ module OpenErp
       create_taxes_line(order) if order_payload['totals']['tax'].gsub(/[^\d\.]/, '') # need to format money string to number
       create_discount_line(order)
 
-      # execute workflow
-      # SaleOrder.rpc_exec_workflow('order_confirm', payload[:order][:id])
-      object_service(:exec_workflow, 'sale.order','order_confirm', payload[:order][:id])
-
       order.reload
+
+      # execute workflow
+      test = SaleOrder.rpc_exec_workflow('order_confirm', payload[:order][:id])
+      test.save
+
     end
 
     def update!
