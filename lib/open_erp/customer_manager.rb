@@ -43,7 +43,12 @@ module OpenErp
       customer.country_id = ResCountry.find(code: address['country']).first.id
 
       if address['state'].present?
-        customer.state_id = ResCountryState.find(name: address['state']).first.id
+        # search via code vs name
+        if address['state'].length > 2
+          customer.state_id = (!ResCountryState.find(name: address['state']).blank?) ? ResCountryState.find(name: address['state']).first.id : nil
+        else
+          customer.state_id = (!ResCountryState.find(code: address['state']).blank?)  ? ResCountryState.find(code: address['state']).first.id : nil
+        end
       end
     end
 
@@ -65,7 +70,7 @@ module OpenErp
         if address['state'].length > 2
           ship_customer.state_id = (!ResCountryState.find(name: address['state']).blank?) ? ResCountryState.find(name: address['state']).first.id : nil
         else
-          ship_customer.state_id = (!ResCountryState.find(name: address['state']).blank?)  ? ResCountryState.find(code: address['state']).first.id : nil
+          ship_customer.state_id = (!ResCountryState.find(code: address['state']).blank?)  ? ResCountryState.find(code: address['state']).first.id : nil
         end
       end
 
