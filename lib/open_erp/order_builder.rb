@@ -54,8 +54,7 @@ module OpenErp
       order.reload
 
       # execute workflow
-      test = SaleOrder.rpc_exec_workflow('order_confirm', payload[:order][:id])
-      test.save
+      SaleOrder.rpc_exec_workflow('order_confirm', payload[:order][:id])
 
     end
 
