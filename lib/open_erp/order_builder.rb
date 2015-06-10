@@ -52,7 +52,7 @@ module OpenErp
       create_discount_line(order)
 
       # execute workflow
-      order.rpc_exec_workflow('sale.order', 'order_confirm', payload[:order][:id])
+      order.rpc_exec_workflow('order_confirm', payload[:order][:id])
 
       order.reload
     end
