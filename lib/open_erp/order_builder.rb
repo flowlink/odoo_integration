@@ -40,6 +40,9 @@ module OpenErp
       # NOTE return here if order is not saved
       order.save
 
+      # execute workflow
+      order.wkf_action('order_confirm')
+      
       # NOTE Check whether it's possible to sales order lines along with
       # the order in one single call
 
@@ -54,7 +57,7 @@ module OpenErp
       order.reload
 
       # execute workflow
-      SaleOrder.rpc_exec_workflow('order_confirm', payload[:order][:id])
+      # SaleOrder.rpc_exec_workflow('order_confirm', payload[:order][:id])
 
     end
 
