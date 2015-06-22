@@ -18,7 +18,7 @@ module OpenErp
       order = SaleOrder.new({
         name: payload[:order][:id],
         date_order: Time.parse(payload['order']['placed_on']).strftime('%Y-%m-%d'),
-        state: "done",
+        # state: "done",
         invoice_quantity: "order"
       })
 
@@ -48,10 +48,15 @@ module OpenErp
       # NOTE Wombat default order object has no shipments
       # create_shipping_line(order)
 
-      create_taxes_line(order) if order_payload['totals']['tax']
+      create_taxes_line(order) if order_payload['totals']['tax'].gsub(/[^\d\.]/, '') # need to format money string to number
       create_discount_line(order)
 
       order.reload
+
+      # execute workflow
+      order.wkf_action('order_confirm')
+      # SaleOrder.rpc_exec_workflow('order_confirm', payload[:order][:id])
+
     end
 
     def update!
@@ -81,7 +86,7 @@ module OpenErp
       end
 
       def update_totals(order)
-        order.amount_tax = payload['order']['totals']['tax'].to_f
+        order.amount_tax = payload['order']['totals']['tax'].gsub(/[^\d\.]/, '').to_f # need to format money string to number
       end
 
       def find_order
@@ -141,7 +146,7 @@ module OpenErp
         line.order_id = order.id
         line.name = "Taxes"
         line.product_uom_qty = 1.0
-        line.price_unit = payload['order']['totals']['tax']
+        line.price_unit = payload['order']['totals']['tax'].gsub(/[^\d\.]/, '') # need to format money string to number
         line.save
       end
 
@@ -166,7 +171,7 @@ module OpenErp
         line.order_id = order.id
         line.name = "Shipping - #{shipment_numbers}"
         line.product_uom_qty = 1.0
-        line.price_unit = payload['order']['totals']['shipping']
+        line.price_unit = payload['order']['totals']['shipping'].gsub(/[^\d\.]/, '') # need to format money string to number
         line.save
       end
 
