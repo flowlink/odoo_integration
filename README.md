@@ -4,9 +4,6 @@ This is a fully hosted and supported integration for use with the
 [Wombat](http://wombat.co) product. With this integration you can perform the 
 following functions:
 
-* Retreive products from OpenERP
-* Retreive product inventory from OpenERP
-* Retreive shipments from OpenERP
 * Send orders to OpenERP
 * Update existing orders on OpenERP
 
