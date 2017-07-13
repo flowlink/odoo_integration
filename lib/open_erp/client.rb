@@ -1,5 +1,6 @@
 module OpenErp
   class Client
+    require 'ooor'
     attr_reader :client
 
     def initialize(params)
