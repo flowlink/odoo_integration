@@ -4,7 +4,6 @@ module OpenErp
 
     def initialize(payload, config)
       @payload = payload
-
       @order_payload = payload[:order]
       @config = config
       @products = []
@@ -16,25 +15,25 @@ module OpenErp
       end
 
       order = SaleOrder.new({
-        name: payload[:order][:id],
-        date_order: Time.parse(payload['order']['placed_on']).strftime('%Y-%m-%d'),
+        name: @payload[:order][:id],
+        date_order: Time.parse(@payload[:order][:placed_on]).strftime('%Y-%m-%d'),
         # state: "done",
         invoice_quantity: "order"
       })
 
-      set_picking_policy(order, config['openerp_shipping_policy'])
-      set_order_policy(order, config['openerp_invoice_policy'])
-      set_currency(order, payload['order']['currency'])
-      set_customer(order, payload['order']['email'])
+      set_picking_policy(order, @config[:openerp_shipping_policy])
+      #set_order_policy(order, @config['openerp_invoice_policy'])
+      set_currency(order, @payload[:order][:currency])
+      set_customer(order, @payload[:order][:email])
 
-      order.shipped = payload['order']['status'] == 'complete' ? true : false
+      #order.shipped = @payload['order']['status'] == 'complete' ? true : false
       order.partner_invoice_id = order.partner_id
-      order.partner_shipping_id = set_partner_shipping_id(payload['order']['email'], order)
+      order.partner_shipping_id = set_partner_shipping_id(@payload[:order][:email], order)
 
-      # order.shop_id = config['openerp_shop'] # is this needed? shop_id doesnt seem to exist anymore
+      # order.shop_id = @config['openerp_shop'] # is this needed? shop_id doesnt seem to exist anymore
 
-      order.pricelist_id = set_pricelist(config['openerp_pricelist'])
-      order.incoterm = StockIncoterms.find(:all, :domain => ['name', '=', config['openerp_shipping_name']]).first.try(:id)
+      #order.pricelist_id = set_pricelist(@config['openerp_pricelist'])
+      order.incoterm = StockIncoterms.find(:all, :domain => ['name', '=', @config[:openerp_shipping_name]]).first.try(:id)
       update_totals(order)
 
       # NOTE return here if order is not saved
@@ -48,14 +47,20 @@ module OpenErp
       # NOTE Wombat default order object has no shipments
       # create_shipping_line(order)
 
-      create_taxes_line(order) if order_payload['totals']['tax'].gsub(/[^\d\.]/, '') # need to format money string to number
+      #create_taxes_line(order) if @order_payload[:totals][:tax].gsub(/[^\d\.]/, '') # need to format money string to number
+      create_taxes_line(order) if @order_payload[:totals][:tax]
       create_discount_line(order)
 
       order.reload
 
       # execute workflow
-      order.wkf_action('order_confirm')
+      # order.wkf_action('order_confirm')
       # SaleOrder.rpc_exec_workflow('order_confirm', payload[:order][:id])
+
+      # Order confirmation workflow isn't working, change state manually
+      order.state = 'sale'
+      order.confirmation_date = Time.now
+      order.save
 
     end
 
@@ -65,10 +70,10 @@ module OpenErp
       end
 
       order = find_order
-      order.partner_id = set_customer(order, payload['order']['email'])
+      order.partner_id = set_customer(order, @payload[:order][:email])
       order.partner_invoice_id = order.partner_id
-      order.partner_shipping_id = set_partner_shipping_id(payload['order']['email'], order)
-      order.shipped = payload['order']['status'] == 'complete' ? true : false
+      order.partner_shipping_id = set_partner_shipping_id(@payload[:order][:email], order)
+      order.shipped = @payload[:order][:status] == 'complete' ? true : false
       update_totals(order)
 
       order.save
@@ -78,19 +83,20 @@ module OpenErp
 
     private
       def validate_line_items?
-        !payload[:order][:line_items].any? do |line_item|
+        !@payload[:order][:line_items].any? do |line_item|
           result = ProductProduct.find(default_code: line_item[:product_id]).to_a
-          products.push result.first if result.first
+          @products.push result.first if result.first
           result.length < 1
         end
       end
 
       def update_totals(order)
-        order.amount_tax = payload['order']['totals']['tax'].gsub(/[^\d\.]/, '').to_f # need to format money string to number
+        #order.amount_tax = payload['order']['totals']['tax'].gsub(/[^\d\.]/, '').to_f # need to format money string to number
+        order.amount_tax = payload[:order][:totals][:tax].to_f # need to format money string to number
       end
 
       def find_order
-        return @sale_order if @sale_order ||= SaleOrder.find(name: "#{order_payload[:id]}").first
+        return @sale_order if @sale_order ||= SaleOrder.find(name: "#{@order_payload[:id]}").first
         raise OpenErpEndpointError, "Order #{order[:number]} could not be found on OpenErp!"
       end
 
@@ -106,7 +112,7 @@ module OpenErp
           line = order.order_line.find { |line| line.product_id == li[:product_id] }
 
           if line
-            line.product_id = products.find { |p| p.default_code == line[:product_id] }.id
+            line.product_id = @products.find { |p| p.default_code == line[:product_id] }.id
             line.tax_id = line_payload[:tax_id].to_s.split(",") if line[:tax_id]
             line.product_uom_qty = li[:quantity].to_f
             line.price_unit = li[:price]
@@ -126,7 +132,7 @@ module OpenErp
       #   with the following access level are currently allowed to do that:
       #
       #   - Accounting & Finance/Financial Manager
-      #   
+      #
       #   (Document model: account.tax)
       #   OpenERP Server Error
       #
@@ -135,7 +141,8 @@ module OpenErp
         line.tax_id = line_payload[:tax_id].to_s.split(",") if line_payload[:tax_id]
         line.order_id = order.id
         line.name = line_payload[:name]
-        line.product_id = products.find { |p| p.default_code == line_payload[:product_id] }.id
+        line.product_id = @products.find { |p| p.default_code == line_payload[:product_id] }.id
+        line.product_uom = 1
         line.product_uom_qty = line_payload[:quantity].to_f
         line.price_unit = line_payload[:price]
         line.save
@@ -144,9 +151,11 @@ module OpenErp
       def create_taxes_line(order)
         line = SaleOrderLine.new
         line.order_id = order.id
-        line.name = "Taxes"
+        line.name = 'Taxes'
+        line.product_uom = 1
         line.product_uom_qty = 1.0
-        line.price_unit = payload['order']['totals']['tax'].gsub(/[^\d\.]/, '') # need to format money string to number
+        line.product_id = get_adjustment_product_id('tax')
+        line.price_unit = @payload[:order][:totals][:tax]
         line.save
       end
 
@@ -160,19 +169,35 @@ module OpenErp
         line = SaleOrderLine.new
         line.order_id = order.id
         line.name = "Discounts"
+        line.product_uom = 1
         line.product_uom_qty = 1.0
+        line.product_id = get_adjustment_product_id('discount')
         line.price_unit = discount_adjustments.map { |adj| adj[:value] }.reduce :+
         line.save
       end
 
       def create_shipping_line(order)
-        shipment_numbers = payload['order']['shipments'].map { |shipment| shipment['number'] }.join(', ')
+        shipment_numbers = @payload[:order][:shipments].map { |shipment| shipment['number'] }.join(', ')
         line = SaleOrderLine.new
         line.order_id = order.id
         line.name = "Shipping - #{shipment_numbers}"
+        line.product_uom = 1
         line.product_uom_qty = 1.0
-        line.price_unit = payload['order']['totals']['shipping'].gsub(/[^\d\.]/, '') # need to format money string to number
+        line.product_id = get_adjustment_product_id('shipping')
+        line.price_unit = @payload[:order][:totals][:shipping]
         line.save
+      end
+
+      def get_adjustment_product_id(product_name)
+        product = ProductProduct.find(name: product_name).first
+        if product == nil
+          product = ProductProduct.new
+          product.name = product_name
+          product.display_name = product_name.capitalize
+          product.save
+        end
+
+        product.id
       end
 
       def set_picking_policy(order, policy)
@@ -205,18 +230,19 @@ module OpenErp
       end
 
       def set_customer(order, email)
-        result = ResPartner.find(email: email, type: 'default')
-        customer = if result.empty?
+        #result = ResPartner.find(email: email, type: 'default')
+        result = ResPartner.find(email: email)
+        customer = if result.first == nil
                      OpenErp::CustomerManager.new(ResPartner.new, payload)
                    else
                      OpenErp::CustomerManager.new(result.first, payload)
                    end
-
-        order.partner_id = customer.update!
+        customer = customer.update!
+        order.partner_id = customer.id
       end
 
       def set_partner_shipping_id(email, order)
-        result = ResPartner.find(email: email, type: 'delivery')
+        result = ResPartner.find(email: email)
         if result.length > 0
           result.first.id
         else

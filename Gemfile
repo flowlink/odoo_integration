@@ -6,7 +6,8 @@ gem 'tilt-jbuilder', require: 'sinatra/jbuilder'
 gem 'capistrano'
 
 gem 'httparty'
-gem 'ooor', github: 'akretion/ooor'
+#gem 'ooor', github: 'akretion/ooor'
+gem 'ooor'
 gem 'honeybadger'
 
 group :test do
