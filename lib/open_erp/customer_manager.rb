@@ -11,14 +11,18 @@ module OpenErp
       update_category
       update_addresses
 
-      customer.save
-      customer
+      # Without the following, @customer.signup_valid will be nil
+      # which causes problems
+      @customer.signup_token = true
+
+      @customer.save
+      @customer
     end
 
     private
 
     def update_category
-      customer.category_id = []
+      @customer.category_id = []
     end
 
     def update_addresses
@@ -32,22 +36,22 @@ module OpenErp
 
     def update_billing_address
       address = payload['order']['billing_address']
-      customer.type       = "default"
-      customer.email      = payload['order']['email']
-      customer.name       = "#{address['firstname']} #{address['lastname']}"
-      customer.street     = address['address1']
-      customer.street2    = address['address2']
-      customer.city       = address['city']
-      customer.zip        = address['zipcode']
-      customer.phone      = address['phone']
-      customer.country_id = ResCountry.find(code: address['country']).first.id
+      #customer.type       = "default"
+      @customer.email      = payload['order']['email']
+      @customer.name       = "#{address['firstname']} #{address['lastname']}"
+      @customer.street     = address['address1']
+      @customer.street2    = address['address2']
+      @customer.city       = address['city']
+      @customer.zip        = address['zipcode']
+      @customer.phone      = address['phone']
+      @customer.country_id = ResCountry.find(code: address['country']).first.id
 
       if address['state'].present?
         # search via code vs name
         if address['state'].length > 2
-          customer.state_id = (!ResCountryState.find(name: address['state']).blank?) ? ResCountryState.find(name: address['state']).first.id : nil
+          @customer.state_id = (!ResCountryState.find(name: address['state']).blank?) ? ResCountryState.find(name: address['state']).first.id : nil
         else
-          customer.state_id = (!ResCountryState.find(code: address['state']).blank?)  ? ResCountryState.find(code: address['state']).first.id : nil
+          @customer.state_id = (!ResCountryState.find(code: address['state']).blank?)  ? ResCountryState.find(code: address['state']).first.id : nil
         end
       end
     end
@@ -64,6 +68,10 @@ module OpenErp
       ship_customer.zip        = address['zipcode']
       ship_customer.phone      = address['phone']
       ship_customer.country_id = ResCountry.find(code: address['country']).first.id
+
+      # Without the following, @customer.signup_valid will be nil
+      # which causes problems
+      ship_customer.signup_token = true
 
       if address['state'].present?
         # search via code vs name

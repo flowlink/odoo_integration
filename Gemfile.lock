@@ -1,14 +1,6 @@
 GIT
-  remote: git://github.com/akretion/ooor.git
-  revision: b431f041b94b5b309725e8f3b5bdfc8e3469ea50
-  specs:
-    ooor (2.0.4)
-      activemodel (>= 2.3.5)
-      faraday
-
-GIT
-  remote: git://github.com/spree/endpoint_base.git
-  revision: 5a819541b20ade1b7ec6eb19f38fbab7eaf3e14e
+  remote: git://github.com/flowlink/endpoint_base.git
+  revision: b3c06ec88b6cfcd9bea165def5f0592a0707730e
   specs:
     endpoint_base (0.3)
       activesupport
@@ -18,63 +10,65 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (4.1.1)
-      activesupport (= 4.1.1)
-      builder (~> 3.1)
-    activesupport (4.1.1)
-      i18n (~> 0.6, >= 0.6.9)
-      json (~> 1.7, >= 1.7.7)
+    activemodel (5.1.2)
+      activesupport (= 5.1.2)
+    activesupport (5.1.2)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (~> 0.7)
       minitest (~> 5.1)
-      thread_safe (~> 0.1)
       tzinfo (~> 1.1)
-    addressable (2.3.5)
-    builder (3.2.2)
-    capistrano (3.0.1)
+    addressable (2.5.1)
+      public_suffix (~> 2.0, >= 2.0.2)
+    airbrussh (1.3.0)
+      sshkit (>= 1.6.1, != 1.7.0)
+    capistrano (3.8.2)
+      airbrussh (>= 1.0.0)
       i18n
       rake (>= 10.0.0)
-      sshkit (>= 0.0.23)
-    coderay (1.1.0)
-    crack (0.4.1)
-      safe_yaml (~> 0.9.0)
-    diff-lcs (1.2.5)
-    docile (1.1.1)
-    dotenv (0.9.0)
-    faraday (0.9.0)
+      sshkit (>= 1.9.0)
+    coderay (1.1.1)
+    concurrent-ruby (1.0.5)
+    crack (0.4.3)
+      safe_yaml (~> 1.0.0)
+    diff-lcs (1.3)
+    docile (1.1.5)
+    faraday (0.12.1)
       multipart-post (>= 1.2, < 3)
-    foreman (0.63.0)
-      dotenv (>= 0.7)
-      thor (>= 0.13.6)
-    honeybadger (1.16.3)
-      json
-    httparty (0.12.0)
-      json (~> 1.8)
+    foreman (0.84.0)
+      thor (~> 0.19.1)
+    honeybadger (3.1.2)
+    httparty (0.15.5)
       multi_xml (>= 0.5.2)
-    i18n (0.6.11)
-    jbuilder (2.1.3)
-      activesupport (>= 3.0.0, < 5)
-      multi_json (~> 1.2)
-    json (1.8.1)
-    kgio (2.8.1)
+    i18n (0.8.6)
+    jbuilder (2.7.0)
+      activesupport (>= 4.2.0)
+      multi_json (>= 1.2)
+    json (2.1.0)
+    kgio (2.11.0)
     method_source (0.8.2)
-    minitest (5.4.1)
-    multi_json (1.10.1)
-    multi_xml (0.5.5)
+    minitest (5.10.2)
+    multi_json (1.12.1)
+    multi_xml (0.6.0)
     multipart-post (2.0.0)
-    net-scp (1.1.2)
+    net-scp (1.2.1)
       net-ssh (>= 2.6.5)
-    net-ssh (2.7.0)
-    pry (0.9.12.4)
-      coderay (~> 1.0)
-      method_source (~> 0.8)
+    net-ssh (4.1.0)
+    ooor (2.4.0)
+      activemodel (>= 3.2.0)
+      faraday
+    pry (0.10.4)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
       slop (~> 3.4)
-    rack (1.5.2)
-    rack-protection (1.5.1)
+    public_suffix (2.0.5)
+    rack (1.6.8)
+    rack-protection (1.5.3)
       rack
-    rack-test (0.6.2)
-      rack (>= 1.0)
-    raindrops (0.12.0)
-    rake (10.1.1)
-    rb-fsevent (0.9.4)
+    rack-test (0.7.0)
+      rack (>= 1.0, < 3)
+    raindrops (0.18.0)
+    rake (12.0.0)
+    rb-fsevent (0.9.8)
     rspec (2.13.0)
       rspec-core (~> 2.13.0)
       rspec-expectations (~> 2.13.0)
@@ -83,37 +77,32 @@ GEM
     rspec-expectations (2.13.0)
       diff-lcs (>= 1.1.3, < 2.0)
     rspec-mocks (2.13.1)
-    safe_yaml (0.9.7)
-    simplecov (0.8.2)
+    safe_yaml (1.0.4)
+    simplecov (0.14.1)
       docile (~> 1.1.0)
-      multi_json
-      simplecov-html (~> 0.8.0)
-    simplecov-html (0.8.0)
-    sinatra (1.4.4)
-      rack (~> 1.4)
+      json (>= 1.8, < 3)
+      simplecov-html (~> 0.10.0)
+    simplecov-html (0.10.1)
+    sinatra (1.4.8)
+      rack (~> 1.5)
       rack-protection (~> 1.4)
-      tilt (~> 1.3, >= 1.3.4)
-    slop (3.4.7)
-    sshkit (1.3.0)
+      tilt (>= 1.3, < 3)
+    slop (3.6.0)
+    sshkit (1.14.0)
       net-scp (>= 1.1.2)
-      net-ssh
-      term-ansicolor
-    term-ansicolor (1.2.2)
-      tins (~> 0.8)
-    thor (0.18.1)
-    thread_safe (0.3.4)
+      net-ssh (>= 2.8.0)
+    thor (0.19.4)
+    thread_safe (0.3.6)
     tilt (1.4.1)
-    tilt-jbuilder (0.5.3)
+    tilt-jbuilder (0.7.1)
       jbuilder
-      tilt (<= 1.4.1)
-    tins (0.13.1)
-    tzinfo (1.2.2)
+      tilt (>= 1.3.0, < 3)
+    tzinfo (1.2.3)
       thread_safe (~> 0.1)
-    unicorn (4.7.0)
+    unicorn (5.3.0)
       kgio (~> 2.6)
-      rack
       raindrops (~> 0.7)
-    vcr (2.8.0)
+    vcr (3.0.3)
     webmock (1.11.0)
       addressable (>= 2.2.7)
       crack (>= 0.3.2)
@@ -127,7 +116,7 @@ DEPENDENCIES
   foreman
   honeybadger
   httparty
-  ooor!
+  ooor
   pry
   rack-test
   rb-fsevent (~> 0.9.1)
@@ -139,3 +128,6 @@ DEPENDENCIES
   unicorn
   vcr
   webmock (= 1.11.0)
+
+BUNDLED WITH
+   1.15.1
