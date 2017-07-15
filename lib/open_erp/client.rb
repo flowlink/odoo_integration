@@ -1,21 +1,13 @@
 module OpenErp
   class Client
     require 'ooor'
-
     attr_reader :client
 
     def initialize(params)
-      tries ||= 3
       @client = Ooor.new(params)
     rescue
-      if (tries -= 1) > 0
-        sleep 2
-        retry
-      else
-        raise OpenErpEndpointError,
-             "There was a problem establishing a connection to OpenERP." +
-             "Please ensure your credentials are valid."
-      end
+      raise OpenErpEndpointError, 'There was a problem establishing a connection to OpenERP.
+        Please ensure your credentials are valid.'
     end
 
 
